@@ -2,6 +2,10 @@ server:
   port: 8080
 
 spring:
+  application:
+    name: "accounts"
+  profiles:
+    active: "prod"
   datasource:
     url: jdbc:h2:mem:testdb
     driverClassName: org.h2.Driver
@@ -13,23 +17,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      dll-auto: update
+      ddl-auto: update
     show-sql: true
   config:
-    import:
-      - "application_qa.yml"
-      - "application_prod.yml"
-  profiles:
-    active:
-      - "qa"
-
-build:
-  version: "3.0"
-
-accounts:
-  message: "Welcome to EazyBank accounts related local APIs"
-  contactDetails:
-    name: "Paulo Cavalcante - Developer"
-    email: "educavalcantedev@gmail.com"
-  onCallSupport:
-    - (555) 555-1234
+    import: "optional:configserver:http://localhost:8071/"
