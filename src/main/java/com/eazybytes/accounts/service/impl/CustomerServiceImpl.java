@@ -14,18 +14,19 @@ import com.eazybytes.accounts.repository.CustomerRepository;
 import com.eazybytes.accounts.service.ICustomerService;
 import com.eazybytes.accounts.service.client.CardsFeignClient;
 import com.eazybytes.accounts.service.client.LoansFeignClient;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
-public class CustomerService implements ICustomerService {
+@AllArgsConstructor
+public class CustomerServiceImpl implements ICustomerService {
 
-    private final AccountsRepository accountsRepository;
-    private final CustomerRepository customerRepository;
-    private final CardsFeignClient cardsFeignClient;
-    private final LoansFeignClient loansFeignClient;
+    private AccountsRepository accountsRepository;
+    private CustomerRepository customerRepository;
+    private CardsFeignClient cardsFeignClient;
+    private LoansFeignClient loansFeignClient;
 
     @Override
     public CustomerDetailsDto fetchCustomerDetails(String mobileNumber, String correlationId) {
@@ -41,10 +42,16 @@ public class CustomerService implements ICustomerService {
         customerDetailsDto.setAccountsDto(AccountsMapper.mapToAccountsDto(accounts, new AccountsDto()));
 
         ResponseEntity<CardsDto> cardsDtoResponseEntity = cardsFeignClient.fetchCardDetails(correlationId, mobileNumber);
-        customerDetailsDto.setCardsDto(cardsDtoResponseEntity.getBody());
+
+        if(cardsDtoResponseEntity != null) {
+            customerDetailsDto.setCardsDto(cardsDtoResponseEntity.getBody());
+        }
 
         ResponseEntity<LoansDto> loansDtoResponseEntity = loansFeignClient.fetchLoanDetails(correlationId, mobileNumber);
-        customerDetailsDto.setLoansDto(loansDtoResponseEntity.getBody());
+
+        if(loansDtoResponseEntity != null) {
+            customerDetailsDto.setLoansDto(loansDtoResponseEntity.getBody());
+        }
 
         return customerDetailsDto;
     }
